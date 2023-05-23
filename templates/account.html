@@ -1,0 +1,28 @@
+{% extends "template.html" %}
+
+{% block body %}
+
+<h2>Submission Page</h2>
+<p>This is the submission page!</p>
+
+<br>
+<h3>Welcome {{username}}</h3>
+<p>Your data is being processed and will be available here in about 30 minutes once you refresh the page.</p>
+<br>
+
+<p><strong>Note:</strong> The files listed below are being written to and will be complete after the processing is finished.</p>
+
+<ul class="file-list">
+  {% for filename in filenames %}
+    <li class="file-item">
+      <i class="fas fa-file file-icon"></i>
+      <a href="{{ url_for('view_file', filename=filename) }}" class="file-link">{{ filename }}</a>
+    </li>
+  {% endfor %}
+</ul>
+
+<form action="/home" method="POST">
+  <input type="submit" value="Home" class="home-btn">
+</form>
+
+{% endblock %}

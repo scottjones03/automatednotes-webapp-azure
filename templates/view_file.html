@@ -1,0 +1,17 @@
+{% extends "template.html" %}
+{% block body %}
+
+<h2>View File: {{ filename }}</h2>
+
+{% if file_content %}
+<div class="form-group">
+    <label for="fileContent">File Content:</label>
+    <div id="fileContent" class="file-content">{{ file_content | safe }}</div>
+</div>
+{% endif %}
+
+<form action="/home" method="POST">
+    <input type="submit" value="Home" class="home-btn">
+</form>
+
+{% endblock %}

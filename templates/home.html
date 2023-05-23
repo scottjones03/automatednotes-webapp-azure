@@ -1,0 +1,79 @@
+{% extends "template.html" %}
+
+{% block body %}
+
+<div class="container">
+    <h2 class="page-title">Home Page</h2>
+    <p class="lead-text">Welcome to the Automatic Note Creator! This tool allows you to generate comprehensive notes from uploaded PDFs. Simply follow the steps below to create your notes effortlessly.</p>
+
+    <form action="/account" method="POST" enctype="multipart/form-data" class="upload-form">
+        <div class="form-group">
+            <label for="name">Input Name:</label>
+            <input type="text" name="name" id="name" placeholder="Your Name" class="form-field" value="">
+        </div>
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" class="form-field" placeholder="Your Password">
+        </div>
+
+        <div class="form-group">
+            <label for="fileprefix">File Prefix:</label>
+            <input type="text" name="fileprefix" id="fileprefix" value="" class="form-field" placeholder="Enter File Prefix">
+        </div>
+
+        <div class="form-group">
+            <label for="topic">Topic:</label>
+            <input type="text" name="topic" id="topic" value="computer science" class="form-field" placeholder="Enter Topic">
+        </div>
+
+        <div class="form-group">
+            <label for="content">Content:</label>
+            <textarea name="content" id="content" class="form-field" placeholder="Enter Content">code snippets, examples, algorithms, or pseudocode</textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="questions">Number of Revision Questions:</label>
+            <input type="number" name="questions" id="questions" value="3" class="form-field" placeholder="Enter Number of Revision Questions">
+        </div>
+
+        <div class="form-group">
+            <label for="prompt">Prompt:</label>
+            <textarea name="prompt" id="prompt" class="form-field" placeholder="Enter Prompt"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="pdfFile">Upload PDFs:</label>
+            <input type="file" id="pdfFile" name="pdfFile" accept=".pdf" multiple class="form-field">
+        </div>
+
+        <div class="form-group">
+            <label for="spinBox1">Start Page Index:</label>
+            <input type="number" id="spinBox1" name="spinBox1" min="0" max="100" step="1" value="0" class="form-field" placeholder="Enter Start Page Index">
+        </div>
+
+        <div class="form-group">
+            <label for="modelSelect">Select Model:</label>
+            <select id="modelSelect" name="modelSelect" class="form-field">
+                <option value="3">Model 3</option>
+                <option value="4">Model 4</option>
+            </select>
+        </div>
+
+        <input type="submit" value="Submit" class="submit-btn">
+    </form>
+
+    <div class="description">
+        <h3 class="section-title">How to Use the Automatic Note Creator:</h3>
+        <ol>
+            <li>Enter your name and password to log in.</li>
+            <li>Specify the file prefix, topic, content, and the number of revision questions.</li>
+            <li>Provide a prompt to guide the note generation process.</li>
+            <li>Upload the relevant PDFs.</li>
+            <li>Set the start page index if necessary.</li>
+            <li>Select the desired model for note creation.</li>
+            <li>Click the submit button to generate your notes.</li>
+        </ol>
+    </div>
+</div>
+
+{% endblock %}
