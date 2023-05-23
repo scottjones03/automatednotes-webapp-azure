@@ -87,8 +87,8 @@ with app.app_context():
     db.create_all()
 @app.route("/view_file/<filename>", methods=["GET"])
 def view_file(filename):
-    p=AzureBlobStorageManager.download_file(blob_name='RESPONSE'+filename+'.ext',file_name=filename)
-    with open(p, 'r', encoding='utf-8', errors='replace') as file:
+    p=AzureBlobStorageManager.download_response(filename)
+    with open(p, 'r') as file:
         file_content = file.read()
     html_content = markdown2.markdown(file_content)  # convert Markdown to HTML
     return render_template('view_file.html', filename=filename, file_content=html_content)

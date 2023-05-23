@@ -25,6 +25,20 @@ class AzureBlobStorageManager:
         return local_destination_path
     
     @staticmethod
+    def download_response(filename: str):
+        name = 'RESPONSE'+filename
+        local_destination_path = os.path.join(os.environ.get('TEXT_FOLDER'), name+'.txt')
+        
+        blob_service_client = BlobServiceClient(account_url=AzureBlobStorageManager.URL, credential=AzureBlobStorageManager.CREDENTIALS)
+
+        with open(local_destination_path, 'w') as file:
+            blob_client = blob_service_client.get_blob_client(container='automatednotes', blob=name+'.txt')
+            download_stream = blob_client.download_blob()
+            data=download_stream.readall().decode()
+            file.write(data)
+        return local_destination_path
+    
+    @staticmethod
     def update_jobs(jobqueue: Queue):
         blob_service_client = BlobServiceClient(account_url=AzureBlobStorageManager.URL, credential=AzureBlobStorageManager.CREDENTIALS)
         
