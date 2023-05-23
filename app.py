@@ -140,7 +140,7 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
 def runAPP():
-    app.run(debug=True, port=4949, host='0.0.0.0')
+    app.run()
 
 if __name__ == "__main__":
     runAPP()
