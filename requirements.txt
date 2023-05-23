@@ -4,5 +4,4 @@ werkzeug==2.0.1
 markdown2==2.4.0
 Flask-Login==0.5.0
 pdfid==1.0.4
-Flask-SQLAlchemy==2.5.1
 azure-storage-blob==12.8.1
