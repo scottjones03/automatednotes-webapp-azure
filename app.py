@@ -162,24 +162,12 @@ def allowed_file(filename):
 
 
 
-def runAPP(jobs: queue.Queue): #checking if __name__'s value is '__main__'. __name__ is an python environment variable who's value will always be '__main__' till this is the first instatnce of app.py running
-    global jobsQueue
-    jobsQueue=jobs
-    app.run(debug=True,port=80, host='0.0.0.0') #running flask (Initalised on line 4)
+def runAPP(): #checking if __name__'s value is '__main__'. __name__ is an python environment variable who's value will always be '__main__' till this is the first instatnce of app.py running
+    app.run(debug=False,port=80, host='0.0.0.0') #running flask (Initalised on line 4)
 
 
 
 
 
 if __name__ == "__main__":
-    jobs = queue.Queue()
-
-    # Check if the saved queue file exists and load from it if it does
-    with open('./jobs/jobs.json', 'rb') as f:
-        try:
-            saved_queue = json.load(f)
-            for item in saved_queue:
-                jobs.put(item)
-        except Exception as e:
-            ...
-    runAPP(jobs)
+    runAPP()
