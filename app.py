@@ -1,82 +1,58 @@
 from flask import (Flask, render_template, request, flash, redirect)
 from werkzeug.utils import secure_filename
 import os
+import json
 from prompts import get_default
-import markdown2
 from flask_login import login_user
-from pdfid.pdfid import PDFiD
-import os
-from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin
-import xml.etree.ElementTree as ET
 from azurecloud import AzureBlobStorageManager
+from azure.storage.blob import BlobServiceClient
+import markdown2
+
+class User(UserMixin):
+    def __init__(self, id):
+        self.id = id
+
+    @property
+    def is_active(self):
+        # Here you should write whatever the code is
+        # that checks the database if your user is active
+        return True
+
 
 # Create the LoginManager instance
 login_manager = LoginManager()
 
-
+# Create the BlobServiceClient object which will be used to create a container client
+blob_service_client = BlobServiceClient(AzureBlobStorageManager.URL,AzureBlobStorageManager.CREDENTIALS)
 
 def create_app():
     app = Flask(__name__)
     app.secret_key = os.urandom(24)
     login_manager.init_app(app)  # Initialize it for your application
-    @login_manager.user_loader
-    def load_user(user_id):
-        return User.query.get(int(user_id))
     return app
 
-
-
-def is_pdf_safe(file):
-    """Run PDFiD on the PDF and check the output for signs of exploits."""
-    xmlcontent = PDFiD(file)
-
-    # Parse the XML content into an ElementTree
-    root = ET.fromstring(xmlcontent.toxml())
-
-    # Search for 'JS' and 'JavaScript' tags
-    js_elements = root.findall('.//JS')
-    javascript_elements = root.findall('.//JavaScript')
-
-    # Then check counts
-    if len(js_elements) > 0 or len(javascript_elements) > 0:
-        return False
-
-    return True
-
-
+@login_manager.user_loader
+def load_user(user_id):
+    try:
+        with open('users.json', 'r') as f:
+            users = json.load(f)
+    except Exception:
+        return None
+    if user_id in users:
+        return User(user_id)
+    return None
 
 app = create_app()
 app.config['UPLOAD_FOLDER'] = 'UPLOAD_FOLDER'
 app.config['ALLOWED_EXTENSIONS'] = {'pdf'}
 app.config['TEXT_FOLDER'] = 'TEXT_FOLDER'
-app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:////tmp/695ece9dd1a749c2a94ddeea02d1fce3.db'  # replace with your DB URI
 app.config['PASSWORD']='automatednotes'
 app.config['JSON_FOLDER'] = './jobs'
-
-db = SQLAlchemy(app)
-
-
-
-
-# Update your User model to inherit from UserMixin, which includes required methods
-class User(UserMixin, db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(80), unique=True, nullable=False)
-    filenames = db.relationship('Filename', backref='user', lazy=True)
-
-class Filename(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(120), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-
 
 def filename_to_blobname(filename):
     return filename +'.ext'
 
-
-with app.app_context():
-    db.create_all()
 @app.route("/view_file/<filename>", methods=["GET"])
 def view_file(filename):
     p=AzureBlobStorageManager.download_response(filename)
@@ -110,25 +86,29 @@ def account():
         if request.form.get("with_default", "y")=="y":
             prompts.append(get_default(topic, content, revision_questions))
         if password==app.config["PASSWORD"]: 
-            user = User.query.filter_by(name=usr).first()
+            user = load_user(usr)
             if not user:
-                user = User(name=usr)
-                db.session.add(user)
-                db.session.commit()
-
+                try:
+                    with open('users.json', 'r') as f:
+                        users = dict(json.load(f))
+                except Exception:
+                    users = {}
+                users[usr] = {'id': usr, 'files': []}
+                with open('users.json', 'w') as f:
+                    json.dump(users, f)
+                user = load_user(usr)
             login_user(user, remember=True)
-            # further processing...
+
         else:
             flash('Invalid username or password')
             return redirect(request.url)
         startIndex = int(request.form.get("spinBox1", 0))
-        # Check if a file was uploaded
         if 'pdfFile' not in request.files:
             flash('No file uploaded')
             return redirect(request.url)
 
         files = request.files.getlist('pdfFile')
-  
+
         for file in files:
             if file and allowed_file(file.filename):
                 file.filename = fileprefix+file.filename
@@ -137,35 +117,30 @@ def account():
                 blob_name_job = filename_to_blobname('TODO--'+filename)
                 AzureBlobStorageManager.upload_file(blob_name=blob_name, data=file)
                 AzureBlobStorageManager.upload_file(blob_name=blob_name_job, data=str([filename, blob_name, startIndex, usr, selected_model, prompts]))
-                db_filename = Filename(name=filename, user_id=user.id)
-                db.session.add(db_filename)
-                db.session.commit()
 
-                # if not is_pdf_safe(file.name):
-                #     flash('Potentially unsafe file blocked')
-                #     return redirect(request.url)
+                with open('users.json', 'r') as f:
+                    users = json.load(f)
+                if 'files' in users[usr]:
+                    users[usr]['files'].append(filename)
+                else:
+                    users[usr]['files'] = [filename]
+                with open('users.json', 'w') as f:
+                    json.dump(users, f)
+
                 filenames.append(filename)
             else: 
                 filenames.append("<File Not Defined>")
-    q=User.query.filter_by(name=usr).first()
-    if q:
-        return render_template('account.html', username=usr, filenames=[f.name for f in q.filenames if f])
-    else:
-        return render_template('account.html', username=usr, filenames=[])
+    with open('users.json', 'r') as f:
+        users = json.load(f)
+    user_filenames = users[usr].get('files', [])
+    return render_template('account.html', username=usr, filenames=user_filenames)
 
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
-
-
-
-def runAPP(): #checking if __name__'s value is '__main__'. __name__ is an python environment variable who's value will always be '__main__' till this is the first instatnce of app.py running
-    app.run() #running flask (Initalised on line 4)
-
-
-
-
+def runAPP():
+    app.run(debug=True, port=4949, host='0.0.0.0')
 
 if __name__ == "__main__":
     runAPP()

@@ -1,10 +1,3 @@
-import flask_sqlalchemy
-print(flask_sqlalchemy.__version__)
-
-import sqlalchemy
-print(sqlalchemy.__version__)
-
-
 from azure.storage.blob import BlobServiceClient
 from flask import current_app
 import os
@@ -45,6 +38,8 @@ class AzureBlobStorageManager:
             data=download_stream.readall().decode()
             file.write(data)
         return local_destination_path
+    
+    
     
     @staticmethod
     def update_jobs(jobqueue: Queue):
