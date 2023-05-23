@@ -1,4 +1,4 @@
-from flask import * #importing flask (Install it using python -m pip install flask)
+from flask import (Flask, render_template, request, flash, redirect)
 from werkzeug.utils import secure_filename
 import os
 from prompts import get_default
@@ -161,7 +161,7 @@ def allowed_file(filename):
 
 
 def runAPP(): #checking if __name__'s value is '__main__'. __name__ is an python environment variable who's value will always be '__main__' till this is the first instatnce of app.py running
-    app.run(debug=False,port=8000) #running flask (Initalised on line 4)
+    app.run() #running flask (Initalised on line 4)
 
 
 
