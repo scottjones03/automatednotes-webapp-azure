@@ -49,18 +49,12 @@ def is_pdf_safe(file):
 
 
 app = create_app()
-app.config['UPLOAD_FOLDER'] = os.environ.get('UPLOAD_FOLDER') 
+app.config['UPLOAD_FOLDER'] = 'UPLOAD_FOLDER'
 app.config['ALLOWED_EXTENSIONS'] = {'pdf'}
-app.config['TEXT_FOLDER'] = os.environ.get('TEXT_FOLDER')
-app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:////tmp/{os.environ.get("DATABASE_ID")}.db'  # replace with your DB URI
-# app.config['USER']=[os.environ.get('USER'), 'scott', 'gina']
-app.config['PASSWORD']=os.environ.get('PASSWORD')
-# {os.environ.get('USER'): os.environ.get('PASSWORD'), 'scott': os.environ.get('PASSWORD'),'gina':os.environ.get('PASSWORD')}
-
+app.config['TEXT_FOLDER'] = 'TEXT_FOLDER'
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:////tmp/695ece9dd1a749c2a94ddeea02d1fce3.db'  # replace with your DB URI
+app.config['PASSWORD']='automatednotes'
 app.config['JSON_FOLDER'] = './jobs'
-
-NOTION_TOKEN = os.environ.get('NOTION_TOKEN')
-SESSION_PATH = os.environ.get("SESSION_TOKEN")
 
 db = SQLAlchemy(app)
 
