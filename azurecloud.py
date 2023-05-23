@@ -1,8 +1,16 @@
+import flask_sqlalchemy
+print(flask_sqlalchemy.__version__)
+
+import sqlalchemy
+print(sqlalchemy.__version__)
+
+
 from azure.storage.blob import BlobServiceClient
 from flask import current_app
 import os
 from queue import Queue
 import ast
+
 
 class AzureBlobStorageManager:
     CREDENTIALS = 'N7vtqh8Ud9w2eelF2T+WVochoMHqfNorJNrsBbBq/FgDA9RELp31ldATWYksizlQc3BdTL0CiNCT+AStj147bQ=='

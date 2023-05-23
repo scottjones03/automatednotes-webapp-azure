@@ -1,9 +1,7 @@
 from flask import * #importing flask (Install it using python -m pip install flask)
 from werkzeug.utils import secure_filename
 import os
-import queue
 from prompts import get_default
-import queue
 import markdown2
 from flask_login import login_user
 from pdfid.pdfid import PDFiD
@@ -163,7 +161,7 @@ def allowed_file(filename):
 
 
 def runAPP(): #checking if __name__'s value is '__main__'. __name__ is an python environment variable who's value will always be '__main__' till this is the first instatnce of app.py running
-    app.run(debug=False,port=80, host='0.0.0.0') #running flask (Initalised on line 4)
+    app.run(debug=False,port=8000) #running flask (Initalised on line 4)
 
 
 
