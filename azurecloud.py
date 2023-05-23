@@ -28,7 +28,7 @@ class AzureBlobStorageManager:
     @staticmethod
     def download_response(filename: str):
         name = 'RESPONSE'+filename
-        local_destination_path = os.path.join(current_app.config.get('TEXT_FOLDER'), name+'.txt')
+        local_destination_path = current_app.config.get('TEXT_FOLDER')+ name+'.txt'
         
         blob_service_client = BlobServiceClient(account_url=AzureBlobStorageManager.URL, credential=AzureBlobStorageManager.CREDENTIALS)
 
